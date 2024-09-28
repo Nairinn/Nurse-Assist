@@ -4,7 +4,7 @@ import time
 import random
 from flask import Flask, jsonify
 from threading import Thread  
-from database import insert_data, get_recent_data  
+from database import insert_data, get_recent_data, get_current_data, get_average_data
 
 app = Flask(__name__)
 
@@ -24,7 +24,6 @@ def mock_read_spo2():
     return random.randint(90, 100)
 
 def collect_data():
-    """Collect sensor data every second and insert it into the database."""
     while True:
         temp = mock_read_temp()
         heart_rate = mock_read_heart_rate()
@@ -33,10 +32,22 @@ def collect_data():
         insert_data(temp, heart_rate, spo2)
         time.sleep(1) 
 
-@app.route('/sensor-data', methods=['GET'])
+@app.route('/sensorData', methods=['GET'])
 def get_sensor_data():
-    """Return the most recent sensor data from the database."""
     data = get_recent_data() 
+    
+    return jsonify(data)
+
+@app.route('/currentData', methods=['GET'])
+def get_current():
+    data = get_current_data() 
+    
+    return jsonify(data)
+
+@app.route('/averageData', methods=['GET'])
+def get_average():
+    data = get_average_data() 
+    
     return jsonify(data)
 
 if __name__ == '__main__':
