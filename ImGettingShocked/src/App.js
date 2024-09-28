@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import CurrentData from './CurrentData'
 import './App.css';
 
 function App() {
@@ -90,6 +91,7 @@ function App() {
         </form>
         {message && <p>{message}</p>}
       </header>
+      <CurrentData />
     </div>
   );
 }
