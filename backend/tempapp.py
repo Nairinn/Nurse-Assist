@@ -4,7 +4,7 @@ import time
 import random
 from flask import Flask, jsonify, request
 from threading import Thread  
-from database import insert_data, get_recent_data, get_current_data, get_average_data, get_week_sleep_log
+from database import update_sensor_data_in_db
 from flask_cors import CORS
 import mysql.connector
 
@@ -12,7 +12,7 @@ DB_CONFIG = {
     'host': 'localhost',
     'user': 'tester',
     'password': 'Sunh@ck5',
-    'database': 'project1'
+    'database': 'patient_data'
 }
 
 
@@ -33,59 +33,130 @@ def mock_read_heart_rate():
 def mock_read_spo2():
     return random.randint(90, 100)
 
+def get_all_patient_ids():
+    try:
+        connection = mysql.connector.connect(**DB_CONFIG)
+        cursor = connection.cursor()
+
+        cursor.execute("SELECT id FROM patients")
+        patient_ids = [row[0] for row in cursor.fetchall()]
+
+        return patient_ids 
+
+    except mysql.connector.Error as err:
+        print(f"Error: {err}")
+        return []
+
+    finally:
+        if cursor:
+            cursor.close()
+        if connection:
+            connection.close()
+
 def collect_data():
     while True:
-        temp = mock_read_temp()
-        heart_rate = mock_read_heart_rate()
-        spo2 = mock_read_spo2()
-        
-        insert_data(temp, heart_rate, spo2)
+
+        patient_ids = get_all_patient_ids() 
+
+        for patient_id in patient_ids:
+            temp = mock_read_temp()
+            heart_rate = mock_read_heart_rate()
+            spo2 = mock_read_spo2()
+            update_sensor_data_in_db(patient_id, heart_rate, spo2, temp)
+
         time.sleep(1) 
 
-@app.route('/sensorData', methods=['GET'])
-def get_sensor_data():
-    data = get_recent_data() 
-    
-    return jsonify(data)
+@app.route('/addPatient', methods=['POST'])
+def add_patient():
+    data = request.get_json()
+    name = data.get('name')
+    priority_level = data.get('priority_level')
 
-@app.route('/currentData', methods=['GET'])
-def get_current():
-    data = get_current_data() 
-    
-    return jsonify(data)
+    heart_rate = None
+    blood_oxygen = None
+    temperature = None
 
-@app.route('/averageData', methods=['GET'])
-def get_average():
-    data = get_average_data() 
-    
-    return jsonify(data)
+    try:
+        connection = mysql.connector.connect(**DB_CONFIG)
+        cursor = connection.cursor()
 
-@app.route('/submitSleepData', methods=['POST'])
-def submit_sleep_data():
-    data = request.json
-    sleep_time = data.get('sleep_time')
-    wake_time = data.get('wake_time')
+        cursor.execute(
+            "INSERT INTO patients (name, priority_level, heart_rate, blood_oxygen, temperature) VALUES (%s, %s, %s, %s, %s)",
+            (name, priority_level, heart_rate, blood_oxygen, temperature)
+        )
+        connection.commit()
 
-    conn = mysql.connector.connect(**DB_CONFIG)
-    cursor = conn.cursor()
+        return jsonify({"message": "Patient added successfully"}), 201
 
-    insert_query = "INSERT INTO sleep_data (sleep_time, wake_time) VALUES (%s, %s)"
-    cursor.execute(insert_query, (sleep_time, wake_time))
-    conn.commit()
+    except mysql.connector.Error as err:
+        return jsonify({"error": str(err)}), 500
 
-    cursor.execute("DELETE FROM sleep_data WHERE id NOT IN (SELECT id FROM (SELECT id FROM sleep_data ORDER BY id DESC LIMIT 7) AS t)")
-    conn.commit() 
+    finally:
+        if cursor:
+            cursor.close()
+        if connection:
+            connection.close()
 
-    cursor.close()
-    conn.close()
 
-    return jsonify({'message': 'Sleep data submitted successfully!'}), 200
+@app.route('/patients', methods=['GET'])
+def get_patients():
+    try:
+        connection = mysql.connector.connect(**DB_CONFIG)
+        cursor = connection.cursor()
 
-@app.route('/sleepLogWeek', methods=['GET'])
-def get_week_log():
-    data = get_week_sleep_log()
-    
-    return jsonify(data)
+        cursor.execute("SELECT * FROM patients")
+        rows = cursor.fetchall()
+
+        patients = [
+            {
+                "id": row[0],
+                "name": row[1],
+                "priority_level": row[2],
+                "heart_rate": row[3],
+                "blood_oxygen": row[4],
+                "temperature": str(round(row[5],1)) + "°C",
+                "timestamp": row[6],
+            }
+            for row in rows
+        ]
+
+        return jsonify(patients), 200
+
+    except mysql.connector.Error as err:
+        return jsonify({"error": str(err)}), 500
+
+    finally:
+        if cursor:
+            cursor.close()
+        if connection:
+            connection.close()
+
+@app.route('/updatePatientPriority/<int:patient_id>', methods=['POST'])
+def update_patient_priority(patient_id):
+    data = request.get_json()
+    priority_level = data.get('priority_level')
+
+    try:
+        connection = mysql.connector.connect(**DB_CONFIG)
+        cursor = connection.cursor()
+
+        cursor.execute(
+            "UPDATE patients SET priority_level = %s, timestamp = CURRENT_TIMESTAMP WHERE id = %s",
+            (priority_level, patient_id)
+        )
+        connection.commit()
+
+        return jsonify({"message": "Patient priority updated successfully"}), 200
+
+    except mysql.connector.Error as err:
+        print(f"Error: {err}")
+        return jsonify({"error": str(err)}), 500
+
+    finally:
+        if cursor:
+            cursor.close()
+        if connection:
+            connection.close()
 
 if __name__ == '__main__':
     data_thread = Thread(target=collect_data)
