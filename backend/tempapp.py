@@ -2,6 +2,7 @@ import os
 import glob
 import time
 import random
+import requests
 from flask import Flask, jsonify, request
 from threading import Thread  
 from database import update_sensor_data_in_db
@@ -15,23 +16,24 @@ DB_CONFIG = {
     'database': 'patient_data'
 }
 
+RASPBERRY_PI_IP = "192.168.1.100"  # Replace with the actual IP address of your Raspberry Pi
+RASPBERRY_PI_PORT = 5000
 
 app = Flask(__name__)
 CORS(app)
-#os.system('modprobe w1-gpio')
-#os.system('modprobe w1-therm')
-#base_dir = '/sys/bus/w1/devices/'
-#device_folder = glob.glob(base_dir + '28*')[0]
-#device_file = device_folder + '/w1_slave'
 
-def mock_read_temp():
-    return random.uniform(30, 40)
-
-def mock_read_heart_rate():
-    return random.randint(60, 100)
-
-def mock_read_spo2():
-    return random.randint(90, 100)
+def get_raspberry_pi_data():
+    """Fetch sensor data from Raspberry Pi"""
+    try:
+        response = requests.get(f'http://172.20.10.10:5000/sensor-data')
+        if response.status_code == 200:
+            return response.json()
+        else:
+            print(f"Failed to fetch data from Raspberry Pi. Status code: {response.status_code}")
+            return None
+    except Exception as e:
+        print(f"Error: {e}")
+        return None
 
 def get_all_patient_ids():
     try:
@@ -55,16 +57,21 @@ def get_all_patient_ids():
 
 def collect_data():
     while False:
-
-        patient_ids = get_all_patient_ids() 
+        patient_ids = get_all_patient_ids()
 
         for patient_id in patient_ids:
-            temp = mock_read_temp()
-            heart_rate = mock_read_heart_rate()
-            spo2 = mock_read_spo2()
-            update_sensor_data_in_db(patient_id, heart_rate, spo2, temp)
+            # Fetch data from Raspberry Pi
+            pi_data = get_raspberry_pi_data()
 
-        time.sleep(1) 
+            if pi_data:
+                temp = pi_data['temperature_c']
+                heart_rate = pi_data['red_led']  # Assuming red LED corresponds to heart rate
+                spo2 = pi_data['ir_led']  # Assuming IR LED corresponds to SpO2
+
+                # Update the database with the fetched data
+                update_sensor_data_in_db(patient_id, heart_rate, spo2, temp)
+
+        time.sleep(1)  # Sleep for 1 second before fetching data again
 
 @app.route('/addPatient', methods=['POST'])
 def add_patient():
@@ -96,7 +103,6 @@ def add_patient():
             cursor.close()
         if connection:
             connection.close()
-
 
 @app.route('/patients', methods=['GET'])
 def get_patients():
@@ -161,14 +167,20 @@ def update_patient_priority(patient_id):
 @app.route('/updateVitals/<int:patient_id>', methods=['POST'])
 def update_vitals(patient_id):
     start_time = time.time()
-    
-    while time.time() - start_time < 10:
-        temp = mock_read_temp()
-        heart_rate = mock_read_heart_rate()
-        spo2 = mock_read_spo2()
 
-        update_sensor_data_in_db(patient_id, heart_rate, spo2, temp)
-        time.sleep(1)  
+    while time.time() - start_time < 10:
+        # Fetch real sensor data from Raspberry Pi
+        pi_data = get_raspberry_pi_data()
+
+        if pi_data:
+            temp = pi_data['temperature_c']
+            heart_rate = pi_data['red_led']  # Assuming red LED corresponds to heart rate
+            spo2 = pi_data['ir_led']  # Assuming IR LED corresponds to SpO2
+
+            # Update the database with the fetched data
+            update_sensor_data_in_db(patient_id, heart_rate, spo2, temp)
+
+        time.sleep(1)  # Sleep for 1 second before next update
 
     return jsonify({"message": "Patient vitals updated successfully"}), 200
 
@@ -199,4 +211,3 @@ if __name__ == '__main__':
     data_thread.start()
 
     app.run(host='0.0.0.0', port=5000)
-

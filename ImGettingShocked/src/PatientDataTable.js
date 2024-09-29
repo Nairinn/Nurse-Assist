@@ -28,7 +28,7 @@ const PatientDataTable = () => {
       fetchPatients();
       console.log(`Vitals updated for patient ID: ${patientId}`);
     } else {
-        console.log('Error updating vitals');
+      console.log('Error updating vitals');
     }
   };
 
@@ -41,16 +41,37 @@ const PatientDataTable = () => {
       fetchPatients();
       console.log(`Patient ID: ${patientId} deleted successfully.`);
     } else {
-        console.log('Error deleting patient');
+      console.log('Error deleting patient');
+    }
+  };
+
+  const updatePriority = async (patientId, newPriority) => {
+    try {
+      const response = await fetch(`http://127.0.0.1:5000/updatePatientPriority/${patientId}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ priority_level: newPriority }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update priority');
+      }
+
+      fetchPatients();
+    } catch (error) {
+      console.error('Error updating priority:', error);
     }
   };
 
   useEffect(() => {
     fetchPatients();
     const interval = setInterval(fetchPatients, 1000);
-
-    return () => clearInterval(interval); 
+    return () => clearInterval(interval);
   }, []);
+
+  const sortedPatients = [...patients].sort((a, b) => a.priority_level - b.priority_level);
 
   return (
     <div className="h-screen p-6">
@@ -73,20 +94,38 @@ const PatientDataTable = () => {
             </tr>
           </thead>
           <tbody>
-            {patients.map(patient => (
+            {sortedPatients.map(patient => (
               <tr key={patient.id}>
                 <td className="border border-gray-300 p-2">{patient.id}</td>
                 <td className="border border-gray-300 p-2">{patient.name}</td>
-                <td className="border border-gray-300 p-2">{patient.priority_level}</td>
+                <td className="border border-gray-300 p-2">
+                  <select
+                    value={patient.priority_level}
+                    onChange={(e) => updatePriority(patient.id, Number(e.target.value))}
+                    className="border border-gray-300 p-1"
+                  >
+                    {[1, 2, 3, 4, 5].map((priority) => (
+                      <option key={priority} value={priority}>
+                        {priority}
+                      </option>
+                    ))}
+                  </select>
+                </td>
                 <td className="border border-gray-300 p-2">{patient.heart_rate}</td>
                 <td className="border border-gray-300 p-2">{patient.blood_oxygen}</td>
                 <td className="border border-gray-300 p-2">{patient.temperature}</td>
                 <td className="border border-gray-300 p-2">{patient.timestamp}</td>
                 <td className="border border-gray-300 p-2">
-                  <button onClick={() => handleUpdateVitals(patient.id)} className="mr-2 bg-blue-500 text-white p-1 rounded">
-                    Update
+                  <button
+                    onClick={() => handleUpdateVitals(patient.id)}
+                    className="mr-2 bg-blue-500 text-white p-1 rounded"
+                  >
+                    Update Vitals
                   </button>
-                  <button onClick={() => handleDeletePatient(patient.id)} className="bg-red-500 text-white p-1 rounded">
+                  <button
+                    onClick={() => handleDeletePatient(patient.id)}
+                    className="bg-red-500 text-white p-1 rounded"
+                  >
                     Delete
                   </button>
                 </td>
