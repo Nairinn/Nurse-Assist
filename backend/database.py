@@ -111,8 +111,6 @@ def update_sensor_data_in_db(patient_id, heart_rate, blood_oxygen, temperature):
     try:
         connection = mysql.connector.connect(**DB_CONFIG)
         cursor = connection.cursor()
-
-        # Update query using backticks for the timestamp column
         cursor.execute(
             """
             UPDATE patients 

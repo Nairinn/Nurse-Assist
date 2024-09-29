@@ -114,7 +114,7 @@ def get_patients():
                 "priority_level": row[2],
                 "heart_rate": row[3],
                 "blood_oxygen": row[4],
-                "temperature": str(round(row[5],1)) + "°C",
+                "temperature": row[5],
                 "timestamp": row[6],
             }
             for row in rows
@@ -172,6 +172,26 @@ def update_vitals(patient_id):
 
     return jsonify({"message": "Patient vitals updated successfully"}), 200
 
+@app.route('/deletePatient/<int:patient_id>', methods=['DELETE'])
+def delete_patient(patient_id):
+    try:
+        connection = mysql.connector.connect(**DB_CONFIG)
+        cursor = connection.cursor()
+
+        cursor.execute("DELETE FROM patients WHERE id = %s", (patient_id,))
+        connection.commit()
+
+        return jsonify({"message": "Patient deleted successfully"}), 200
+
+    except mysql.connector.Error as err:
+        print(f"Error: {err}")
+        return jsonify({"error": str(err)}), 500
+
+    finally:
+        if cursor:
+            cursor.close()
+        if connection:
+            connection.close()
 
 if __name__ == '__main__':
     data_thread = Thread(target=collect_data)

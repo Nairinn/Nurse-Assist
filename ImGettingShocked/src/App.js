@@ -4,10 +4,10 @@ import './App.css';
 import AddPatientForm from './AddPatientForm';
 import PatientDataTable from './PatientDataTable';
 import Login from './Login';
+import CurrentTime from './CurrentTime';
 
 const App = () => {
   const location = useLocation();
-
   return (
     <div>
       {location.pathname !== '/' && ( 
@@ -22,6 +22,8 @@ const App = () => {
         <Route path="/" element={<Login />} />
         <Route path="/main" element={
           <>
+
+            <CurrentTime />
             <AddPatientForm />
             <PatientDataTable />
           </>

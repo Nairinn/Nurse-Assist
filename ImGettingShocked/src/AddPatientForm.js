@@ -22,9 +22,9 @@ const AddPatientForm = () => {
     });
 
     if (response.ok) {
-      alert('Patient added successfully');
+      console.log('Patient added successfully');
     } else {
-      alert('Error adding patient');
+      console.log('Error adding patient');
     }
   };
 

@@ -19,39 +19,29 @@ const PatientDataTable = () => {
     }
   };
 
-  const updatePriority = async (patientId, newPriority) => {
-    try {
-      const response = await fetch(`http://127.0.0.1:5000/updatePatientPriority/${patientId}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ priority_level: newPriority }),
-      });
+  const handleUpdateVitals = async (patientId) => {
+    const response = await fetch(`http://127.0.0.1:5000/updateVitals/${patientId}`, {
+      method: 'POST',
+    });
 
-      if (!response.ok) {
-        throw new Error('Failed to update priority');
-      }
-
+    if (response.ok) {
       fetchPatients();
-    } catch (error) {
-      console.error('Error updating priority:', error);
+      console.log(`Vitals updated for patient ID: ${patientId}`);
+    } else {
+        console.log('Error updating vitals');
     }
   };
 
-  const updateVitals = async (patientId) => {
-    try {
-      const response = await fetch(`http://127.0.0.1:5000/updateVitals/${patientId}`, {
-        method: 'POST',
-      });
+  const handleDeletePatient = async (patientId) => {
+    const response = await fetch(`http://127.0.0.1:5000/deletePatient/${patientId}`, {
+      method: 'DELETE',
+    });
 
-      if (!response.ok) {
-        throw new Error('Failed to update vitals');
-      }
-
+    if (response.ok) {
       fetchPatients();
-    } catch (error) {
-      console.error('Error updating vitals:', error);
+      console.log(`Patient ID: ${patientId} deleted successfully.`);
+    } else {
+        console.log('Error deleting patient');
     }
   };
 
@@ -59,10 +49,8 @@ const PatientDataTable = () => {
     fetchPatients();
     const interval = setInterval(fetchPatients, 1000);
 
-    return () => clearInterval(interval);
+    return () => clearInterval(interval); 
   }, []);
-
-  const sortedPatients = [...patients].sort((a, b) => a.priority_level - b.priority_level);
 
   return (
     <div className="h-screen p-6">
@@ -85,33 +73,21 @@ const PatientDataTable = () => {
             </tr>
           </thead>
           <tbody>
-            {sortedPatients.map(patient => (
+            {patients.map(patient => (
               <tr key={patient.id}>
                 <td className="border border-gray-300 p-2">{patient.id}</td>
                 <td className="border border-gray-300 p-2">{patient.name}</td>
-                <td className="border border-gray-300 p-2">
-                  <select
-                    value={patient.priority_level}
-                    onChange={(e) => updatePriority(patient.id, Number(e.target.value))}
-                    className="border border-gray-300 p-1"
-                  >
-                    {[1, 2, 3, 4, 5].map((priority) => (
-                      <option key={priority} value={priority}>
-                        {priority}
-                      </option>
-                    ))}
-                  </select>
-                </td>
+                <td className="border border-gray-300 p-2">{patient.priority_level}</td>
                 <td className="border border-gray-300 p-2">{patient.heart_rate}</td>
                 <td className="border border-gray-300 p-2">{patient.blood_oxygen}</td>
                 <td className="border border-gray-300 p-2">{patient.temperature}</td>
                 <td className="border border-gray-300 p-2">{patient.timestamp}</td>
                 <td className="border border-gray-300 p-2">
-                  <button
-                    onClick={() => updateVitals(patient.id)}
-                    className="bg-blue-500 text-white px-3 py-1 rounded"
-                  >
-                    Update Vitals
+                  <button onClick={() => handleUpdateVitals(patient.id)} className="mr-2 bg-blue-500 text-white p-1 rounded">
+                    Update
+                  </button>
+                  <button onClick={() => handleDeletePatient(patient.id)} className="bg-red-500 text-white p-1 rounded">
+                    Delete
                   </button>
                 </td>
               </tr>
