@@ -21,14 +21,12 @@ const CurrentData = () => {
     };
 
     fetchData();
-    const interval = setInterval(fetchData, 1000); 
 
-    return () => clearInterval(interval); 
   }, []);
 
   return (
     <div className="h-1/2 p-6">
-      <h2 className="text-4xl mb-6 font-semibold text-gray-800 text-left">Current Data:</h2>
+      <h2 className="text-2xl mb-6 font-semibold text-gray-800 text-left">Last Measured Data:</h2>
       
       {loading ? (
         <ul className="text-left space-y-3 animate-pulse">
