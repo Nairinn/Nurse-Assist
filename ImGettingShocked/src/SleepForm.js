@@ -51,7 +51,6 @@ const SleepForm = () => {
             className="border border-gray-300 p-2 w-full text-black"
           />
         </label>
-        <br />
         <label className="block text-gray-700">
           Wake Time:
           <input 
@@ -62,7 +61,6 @@ const SleepForm = () => {
             className="border border-gray-300 p-2 w-full text-black"
           />
         </label>
-        <br />
         <button 
           type="submit" 
           className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
