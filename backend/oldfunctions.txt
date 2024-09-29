@@ -1,0 +1,44 @@
+@app.route('/sensorData', methods=['GET'])
+def get_sensor_data():
+    data = get_recent_data() 
+    
+    return jsonify(data)
+
+@app.route('/currentData', methods=['GET'])
+def get_current():
+    data = get_current_data() 
+    
+    return jsonify(data)
+
+@app.route('/averageData', methods=['GET'])
+def get_average():
+    data = get_average_data() 
+    
+    return jsonify(data)
+
+@app.route('/submitSleepData', methods=['POST'])
+def submit_sleep_data():
+    data = request.json
+    sleep_time = data.get('sleep_time')
+    wake_time = data.get('wake_time')
+
+    conn = mysql.connector.connect(**DB_CONFIG)
+    cursor = conn.cursor()
+
+    insert_query = "INSERT INTO sleep_data (sleep_time, wake_time) VALUES (%s, %s)"
+    cursor.execute(insert_query, (sleep_time, wake_time))
+    conn.commit()
+
+    cursor.execute("DELETE FROM sleep_data WHERE id NOT IN (SELECT id FROM (SELECT id FROM sleep_data ORDER BY id DESC LIMIT 7) AS t)")
+    conn.commit() 
+
+    cursor.close()
+    conn.close()
+
+    return jsonify({'message': 'Sleep data submitted successfully!'}), 200
+
+@app.route('/sleepLogWeek', methods=['GET'])
+def get_week_log():
+    data = get_week_sleep_log()
+    
+    return jsonify(data)
