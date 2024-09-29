@@ -1,33 +1,27 @@
+#!/usr/bin/env python3
 import os
-import glob
 import time
 from flask import Flask, jsonify
 from smbus2 import SMBus
 
 app = Flask(__name__)
 
-# 1-wire Temperature sensor setup
-os.system('modprobe w1-gpio')
-os.system('modprobe w1-therm')
-base_dir = '/sys/bus/w1/devices/'
-device_folder = glob.glob(base_dir + '28*')[0]  # Adjust this if there are multiple devices
-device_file = device_folder + '/w1_slave'
+# Setup for the temperature sensor
+def sensor():
+    for i in os.listdir('/sys/bus/w1/devices'):
+        if i != 'w1_bus_master1':
+            return i  # Return the first found sensor
 
-def read_temp_raw():
-    """Read raw temperature data from the sensor."""
-    with open(device_file, 'r') as f:
-        lines = f.readlines()
-    return lines
-
-def read_temp():
-    """Parse temperature from the raw data."""
-    lines = read_temp_raw()
-    while lines[0].strip()[-3:] != 'YES':
-        time.sleep(0.2)
-        lines = read_temp_raw()
-    temp_output = lines[1].split(' ')[9]
-    temp_c = float(temp_output[2:]) / 1000.0  # Convert to Celsius
-    return temp_c
+def read_temp(ds18b20):
+    location = '/sys/bus/w1/devices/' + ds18b20 + '/w1_slave'
+    with open(location) as tfile:
+        text = tfile.read()
+    secondline = text.split("\n")[1]
+    temperaturedata = secondline.split(" ")[9]
+    temperature = float(temperaturedata[2:])
+    celsius = temperature / 1000
+    fahrenheit = (celsius * 1.8) + 32
+    return celsius, fahrenheit
 
 # I2C MAX30102 sensor setup
 MAX30102_ADDRESS = 0x57  # I2C address for MAX30102
@@ -51,23 +45,26 @@ def read_max30102():
 
 @app.route('/sensor-data', methods=['GET'])
 def get_sensor_data():
-    """Return sensor data as a JSON response."""
-    # Reading from temperature sensor
-    temp = read_temp()
-    
-    # Reading from MAX30102 sensor
-    red, ir = read_max30102()
-    
-    if red is None or ir is None:
-        return jsonify({
-            'error': 'Failed to read from MAX30102 sensor'
-        }), 500
+    """Return temperature and heart rate data as JSON."""
+    try:
+        # Read from temperature sensor
+        serialNum = sensor()
+        temp_c, temp_f = read_temp(serialNum)
+        
+        # Read from MAX30102 sensor
+        red, ir = read_max30102()
+        
+        if red is None or ir is None:
+            return jsonify({'error': 'Failed to read from MAX30102 sensor'}), 500
 
-    return jsonify({
-        'temperature': temp,
-        'red_led': red,
-        'ir_led': ir
-    })
+        return jsonify({
+            'temperature_c': temp_c,
+            'temperature_f': temp_f,
+            'red_led': red,
+            'ir_led': ir
+        })
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
+    app.run(host='0.0.0.0', port=5000)  # Run the Flask app
