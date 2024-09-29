@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import './App.css';
 import AddPatientForm from './AddPatientForm';
 import PatientDataTable from './PatientDataTable';
@@ -14,23 +14,16 @@ const App = () => {
             NurseAssist
           </h1>
         </div>
-        
-        {/* Navigation Links */}
-        <div className="flex justify-center mt-4">
-          <Link to="/login" className="text-blue-500 hover:underline">
-            Go to Login
-          </Link>
-        </div>
 
         {/* Define Routes */}
         <Routes>
-          <Route path="/" element={
+          <Route path="/" element={<Login />} /> {/* Set Login as the home page */}
+          <Route path="/main" element={
             <>
               <AddPatientForm />
               <PatientDataTable />
             </>
           } />
-          <Route path="/login" element={<Login />} />
         </Routes>
       </div>
     </Router>
