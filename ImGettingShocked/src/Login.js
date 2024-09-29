@@ -9,7 +9,35 @@ const Container = styled.div`
   align-items: center;
   justify-content: center;
   height: 100vh;
-  background: linear-gradient(to bottom, #f0f4f8, #d9e2ec);
+  background-image: url('/background.jpg');
+  background-size: cover; 
+  background-position: center; 
+  background-repeat: no-repeat;
+`;
+
+const HeaderContainer = styled.div`
+  display: flex;
+  flex-direction: row; /* Arrange items horizontally */
+  align-items: center; /* Center items vertically */
+  background-color: #5cbdb5;
+  color: white;
+  padding: 1rem;
+  position: absolute; 
+  top: 20px; 
+  left: 20px; 
+  border-radius: 8px; 
+`;
+
+const HeaderTitle = styled.h2`
+font-size: 1.5rem; /* Adjusted font size */
+font-weight: bold;
+margin: 0; /* Remove default margin */
+`;
+
+const IconContainer = styled.div`
+display: flex;
+justify-content: center; /* Center the image */
+margin-left: 10px;
 `;
 
 const Form = styled.form`
@@ -20,7 +48,6 @@ const Form = styled.form`
   max-width: 400px;
   width: 100%;
   transition: transform 0.3s;
-
   &:hover {
     transform: translateY(-5px);
   }
@@ -42,9 +69,10 @@ const Input = styled.input`
 `;
 
 const Button = styled.button`
-  background-color: #007bff;
+  background-color: #5cbdb5;
   color: white;
-  padding: 0.75rem 1.5rem;
+  margin-top: 10;
+  padding: .5rem 1rem;
   border: none;
   border-radius: 0.5rem;
   cursor: pointer;
@@ -68,6 +96,7 @@ const Title = styled.h2`
   font-weight: bold;
   margin-bottom: 1rem;
   color: #333;
+  text-align: center;
 `;
 
 const Greeting = styled.p`
@@ -104,10 +133,17 @@ const Login = () => {
 
   return (
     <Container>
-      <Greeting>Hey, what's up gangsta? This is Nurse Assist. Enter your details now.</Greeting>
-      <Title>Login</Title>
-      {error && <p style={{ color: 'red' }}>{error}</p>} {/* Display error message */}
+      <HeaderContainer>
+        <HeaderTitle>NurseAssist</HeaderTitle>
+        <IconContainer>
+          <img src='/doctor.png' alt='health symbol' className='w-7 h-7 object-cover' />
+        </IconContainer>
+      </HeaderContainer>
+      <Greeting>Enter your details to monitor patients.</Greeting>
+      
+      
       <Form onSubmit={handleSubmit}>
+        <Title>Login</Title>
         <label style={{ display: 'block', marginBottom: '0.5rem', color: '#4a5568' }} htmlFor="username">Username</label>
         <Input
           type="text"
@@ -124,6 +160,7 @@ const Login = () => {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
+        {error && <p style={{ color: 'red' }}>{error}</p>} {/* Display error message */}
         <Button type="submit">Login</Button>
       </Form>
     </Container>
