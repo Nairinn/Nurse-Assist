@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, Link, Navigate } from 'react-router-dom'; // Import Navigate
 import './App.css';
 import AddPatientForm from './AddPatientForm';
 import PatientDataTable from './PatientDataTable';
@@ -22,13 +22,8 @@ const App = () => {
         </div>
 
         <Routes>
-          <Route path="/" element={
-            <>
-              <AddPatientForm />
-              <PatientDataTable />
-            </>
-          } />
-          <Route path="/login" element={<Login />} />
+          <Route path="/login" element={<Login />} /> {/* Login page route */}
+          <Route path="/" element={<Navigate to="/login" />} /> {/* Redirect root to login */}
         </Routes>
       </div>
     </Router>
