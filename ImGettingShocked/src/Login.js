@@ -2,14 +2,39 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
-// Styled components (you can customize these further)
+// Styled components
 const Container = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   height: 100vh;
-  background: linear-gradient(to bottom, #f0f4f8, #d9e2ec);
+  background-image: url('/background.jpg');
+  background-size: cover; 
+  background-position: center; 
+  background-repeat: no-repeat;
+`;
+
+const HeaderContainer = styled.div`
+  display: flex;
+  align-items: center; 
+  background-color: #5cbdb5;
+  color: white;
+  padding: 1rem;
+  position: absolute; 
+  top: 20px; 
+  left: 20px; 
+  border-radius: 8px; 
+`;
+
+const HeaderTitle = styled.h2`
+  font-size: 1.5rem; 
+  font-weight: bold;
+  margin: 0;
+`;
+
+const IconContainer = styled.div`
+  margin-left: 10px;
 `;
 
 const Form = styled.form`
@@ -42,7 +67,7 @@ const Input = styled.input`
 `;
 
 const Button = styled.button`
-  background-color: #007bff;
+  background-color: #5cbdb5;
   color: white;
   padding: 0.75rem 1.5rem;
   border: none;
@@ -50,16 +75,16 @@ const Button = styled.button`
   cursor: pointer;
   font-size: 1rem;
   transition: background-color 0.3s, transform 0.2s;
-  box-shadow: 0 4px 15px rgba(0, 123, 255, 0.4);
+  box-shadow: 0 4px 15px rgba(92, 189, 181, 0.4);
 
   &:hover {
-    background-color: #0056b3;
+    background-color: #4aa99c;
     transform: translateY(-2px);
   }
 
   &:active {
     transform: translateY(0);
-    box-shadow: 0 2px 10px rgba(0, 123, 255, 0.4);
+    box-shadow: 0 2px 10px rgba(92, 189, 181, 0.4);
   }
 `;
 
@@ -68,12 +93,13 @@ const Title = styled.h2`
   font-weight: bold;
   margin-bottom: 1rem;
   color: #333;
+  text-align: center;
 `;
 
 const Greeting = styled.p`
-  font-size: 1.5rem; /* Increased font size */
-  font-weight: bold; /* Make the text bold */
-  color: #333; /* Darker color for the text */
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #333;
   margin-bottom: 1.5rem;
   text-align: center;
 `;
@@ -84,7 +110,6 @@ const Login = () => {
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
-  // Simple user credentials for authentication
   const users = {
     user1: 'password1',
     user2: 'password2',
@@ -94,22 +119,25 @@ const Login = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    
-    // Check if the username and password are correct
     if (users[username] && users[username] === password) {
-      navigate('/main'); // Navigate to the main page after successful login
+      navigate('/main');
     } else {
-      setError('Invalid username or password'); // Set error message
+      setError('Invalid username or password');
     }
   };
 
   return (
     <Container>
-      <Greeting>Hey, what's up gangsta? This is Nurse Assist. Enter your details now.</Greeting>
-      <Title>Login</Title>
-      {error && <p style={{ color: 'red' }}>{error}</p>} {/* Display error message */}
+      <HeaderContainer>
+        <HeaderTitle>NurseAssist</HeaderTitle>
+        <IconContainer>
+          <img src='/doctor.png' alt='health symbol' className='w-7 h-7 object-cover' />
+        </IconContainer>
+      </HeaderContainer>
+      <Greeting>Enter your details to monitor patients.</Greeting>
       <Form onSubmit={handleSubmit}>
-        <label style={{ display: 'block', marginBottom: '0.5rem', color: '#4a5568' }} htmlFor="username">Username</label>
+        <Title>Login</Title>
+        <label htmlFor="username" style={{ display: 'block', marginBottom: '0.5rem', color: '#4a5568' }}>Username</label>
         <Input
           type="text"
           id="username"
@@ -117,7 +145,7 @@ const Login = () => {
           value={username}
           onChange={(e) => setUsername(e.target.value)}
         />
-        <label style={{ display: 'block', marginBottom: '0.5rem', color: '#4a5568' }} htmlFor="password">Password</label>
+        <label htmlFor="password" style={{ display: 'block', marginBottom: '0.5rem', color: '#4a5568' }}>Password</label>
         <Input
           type="password"
           id="password"
@@ -125,6 +153,7 @@ const Login = () => {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
+        {error && <p style={{ color: 'red' }}>{error}</p>}
         <Button type="submit">Login</Button>
       </Form>
     </Container>

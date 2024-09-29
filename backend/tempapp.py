@@ -54,7 +54,7 @@ def get_all_patient_ids():
             connection.close()
 
 def collect_data():
-    while True:
+    while False:
 
         patient_ids = get_all_patient_ids() 
 
@@ -157,6 +157,21 @@ def update_patient_priority(patient_id):
             cursor.close()
         if connection:
             connection.close()
+
+@app.route('/updateVitals/<int:patient_id>', methods=['POST'])
+def update_vitals(patient_id):
+    start_time = time.time()
+    
+    while time.time() - start_time < 10:
+        temp = mock_read_temp()
+        heart_rate = mock_read_heart_rate()
+        spo2 = mock_read_spo2()
+
+        update_sensor_data_in_db(patient_id, heart_rate, spo2, temp)
+        time.sleep(1)  
+
+    return jsonify({"message": "Patient vitals updated successfully"}), 200
+
 
 if __name__ == '__main__':
     data_thread = Thread(target=collect_data)

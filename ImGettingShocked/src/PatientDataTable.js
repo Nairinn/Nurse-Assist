@@ -33,21 +33,35 @@ const PatientDataTable = () => {
         throw new Error('Failed to update priority');
       }
 
-      // Optionally, re-fetch patients after updating priority
       fetchPatients();
     } catch (error) {
       console.error('Error updating priority:', error);
     }
   };
 
+  const updateVitals = async (patientId) => {
+    try {
+      const response = await fetch(`http://127.0.0.1:5000/updateVitals/${patientId}`, {
+        method: 'POST',
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update vitals');
+      }
+
+      fetchPatients();
+    } catch (error) {
+      console.error('Error updating vitals:', error);
+    }
+  };
+
   useEffect(() => {
     fetchPatients();
-    const interval = setInterval(fetchPatients, 1000); // Update every second
+    const interval = setInterval(fetchPatients, 1000);
 
-    return () => clearInterval(interval); // Clean up on unmount
+    return () => clearInterval(interval);
   }, []);
 
-  // Sort patients by priority level
   const sortedPatients = [...patients].sort((a, b) => a.priority_level - b.priority_level);
 
   return (
@@ -67,6 +81,7 @@ const PatientDataTable = () => {
               <th className="border border-gray-300 p-2">Blood Oxygen</th>
               <th className="border border-gray-300 p-2">Temperature</th>
               <th className="border border-gray-300 p-2">Timestamp</th>
+              <th className="border border-gray-300 p-2">Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -91,6 +106,14 @@ const PatientDataTable = () => {
                 <td className="border border-gray-300 p-2">{patient.blood_oxygen}</td>
                 <td className="border border-gray-300 p-2">{patient.temperature}</td>
                 <td className="border border-gray-300 p-2">{patient.timestamp}</td>
+                <td className="border border-gray-300 p-2">
+                  <button
+                    onClick={() => updateVitals(patient.id)}
+                    className="bg-blue-500 text-white px-3 py-1 rounded"
+                  >
+                    Update Vitals
+                  </button>
+                </td>
               </tr>
             ))}
           </tbody>
