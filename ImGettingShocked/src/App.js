@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import CurrentData from './CurrentData'
+import React from 'react';
+import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
 import './App.css';
 import LastMeasured from './LastMeasured';
 import SleepForm from './SleepForm';
@@ -40,10 +40,24 @@ const App = () => {
         <div className="bg-gray-100 p-4 rounded-lg shadow-md">
           <SleepForm />
         </div>
-        <div className="bg-gray-100 p-4 rounded-lg shadow-md">
-          <h1 className="text-3xl text-center">Sleep Logs</h1>
-          
+        
+        {/* Navigation Links */}
+        <div className="flex justify-center mt-4">
+          <Link to="/login" className="text-blue-500 hover:underline">
+            Go to Login
+          </Link>
         </div>
+
+        {/* Define Routes */}
+        <Routes>
+          <Route path="/" element={
+            <>
+              <AddPatientForm />
+              <PatientDataTable />
+            </>
+          } />
+          <Route path="/login" element={<Login />} />
+        </Routes>
       </div>
     </div>
     </div>

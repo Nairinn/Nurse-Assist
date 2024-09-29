@@ -97,7 +97,7 @@ const Login = () => {
     
     // Check if the username and password are correct
     if (users[username] && users[username] === password) {
-      navigate('/'); // Navigate to the main page after successful login
+      navigate('/main'); // Navigate to the main page after successful login
     } else {
       setError('Invalid username or password'); // Set error message
     }
