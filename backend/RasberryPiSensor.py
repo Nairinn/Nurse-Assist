@@ -6,11 +6,10 @@ from smbus2 import SMBus
 
 app = Flask(__name__)
 
-# Setup for the temperature sensor
 def sensor():
     for i in os.listdir('/sys/bus/w1/devices'):
         if i != 'w1_bus_master1':
-            return i  # Return the first found sensor
+            return i
 
 def read_temp(ds18b20):
     location = '/sys/bus/w1/devices/' + ds18b20 + '/w1_slave'
@@ -23,18 +22,15 @@ def read_temp(ds18b20):
     fahrenheit = (celsius * 1.8) + 32
     return celsius, fahrenheit
 
-# I2C MAX30102 sensor setup
-MAX30102_ADDRESS = 0x57  # I2C address for MAX30102
-bus = SMBus(1)  # I2C bus 1 on Raspberry Pi
+MAX30102_ADDRESS = 0x57
+bus = SMBus(1)
 
 def read_max30102():
     """Read data from the MAX30102 sensor."""
     try:
-        # Example register addresses (check MAX30102 datasheet)
-        red_reg = 0x09  # You may need to verify these registers
+        red_reg = 0x09
         ir_reg = 0x0A
 
-        # Read 2 bytes from both red and IR registers
         red = bus.read_word_data(MAX30102_ADDRESS, red_reg)
         ir = bus.read_word_data(MAX30102_ADDRESS, ir_reg)
 
@@ -47,11 +43,9 @@ def read_max30102():
 def get_sensor_data():
     """Return temperature and heart rate data as JSON."""
     try:
-        # Read from temperature sensor
         serialNum = sensor()
         temp_c, temp_f = read_temp(serialNum)
         
-        # Read from MAX30102 sensor
         red, ir = read_max30102()
         
         if red is None or ir is None:
@@ -67,4 +61,4 @@ def get_sensor_data():
         return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)  # Run the Flask app
+    app.run(host='0.0.0.0', port=5000) 

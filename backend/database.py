@@ -137,7 +137,6 @@ def insert_sensor_data():
     heart_rate = data.get('heart_rate')
     blood_oxygen = data.get('blood_oxygen')
 
-    # Call your existing function to insert data into the database
     insert_data(temperature, heart_rate, blood_oxygen)
 
     return jsonify({'message': 'Data inserted successfully!'}), 201

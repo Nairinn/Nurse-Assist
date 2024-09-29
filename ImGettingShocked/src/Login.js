@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
-// Styled components
 const Container = styled.div`
   display: flex;
   flex-direction: column;
@@ -113,8 +112,6 @@ const Login = () => {
   const users = {
     user1: 'password1',
     user2: 'password2',
-    ChelseaSmells: 'PenisFart',
-    // Add more users as needed
   };
 
   const handleSubmit = (e) => {
