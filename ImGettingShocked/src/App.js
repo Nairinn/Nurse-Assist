@@ -7,7 +7,12 @@ import SleepForm from './SleepForm';
 const App = () => {
   return (
     <div>
-      <h1 className="text-3xl text-center">Nurse Assist</h1>
+      <div className='bg-customRed border-3 border-gray'>
+        <h1 className="flex items-center justify-center text-white font-bold text-2xl">
+             NurseAssist
+        </h1>
+      </div>
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-6">
       <div className="flex flex-col gap-6">
         <div className="bg-gray-100 p-4 rounded-lg shadow-md">
