@@ -131,3 +131,15 @@ def update_sensor_data_in_db(patient_id, heart_rate, blood_oxygen, temperature):
             cursor.close()
         if connection:
             connection.close()
+
+@app.route('/insert-data', methods=['POST'])
+def insert_sensor_data():
+    data = request.get_json()
+    temperature = data.get('temperature')
+    heart_rate = data.get('heart_rate')
+    blood_oxygen = data.get('blood_oxygen')
+
+    # Call your existing function to insert data into the database
+    insert_data(temperature, heart_rate, blood_oxygen)
+
+    return jsonify({'message': 'Data inserted successfully!'}), 201
