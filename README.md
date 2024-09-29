@@ -1,4 +1,4 @@
-Created by Chelsea Lianne Gomez, Naing Lynn Kyaw, Johnnessa Barroquillo for sunhacks 2024
+Created by Chelsea Lianne Gomez, Naing Lynn Kyaw, and Johnnessa Barroquillo for sunhacks 2024
 
 ## Inspiration
 We were inspired by the dedicated nurses who handle numerous responsibilities every day. Our goal was to streamline data management, allowing them to allocate their time and energy more efficiently, while ensuring that every patient receives the care they need.
