@@ -6,7 +6,6 @@ const CurrentData = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      setLoading(true);
       try {
         const response = await fetch('http://127.0.0.1:5000/currentData'); 
         if (!response.ok) {
@@ -28,25 +27,34 @@ const CurrentData = () => {
   }, []);
 
   return (
-    <div>
+    <div className="h-screen p-6">
+      <h2 className="text-4xl mb-6 font-semibold text-gray-800">Current Data:</h2>
+      
       {loading ? (
-        <p>Loading...</p> 
+        <ul className="text-left space-y-3 animate-pulse">
+          <li className="text-lg font-medium text-gray-600">Loading data...</li>
+          <li> 
+            <p>Time: --</p>
+            <p>Blood Oxygen: --</p>
+            <p>Heart Rate: --</p>
+            <p>Temperature: --</p>
+          </li>
+        </ul>
       ) : (
         <div>
-          <h2 className="text-6xl">Current Data:</h2>
           {data.length > 0 ? ( 
-            <ul style={{ listStyleType: 'none' }}>
+            <ul className="text-left space-y-6">
               {data.map(entry => ( 
-                <li key={entry.id}> 
-                  <p>Blood Oxygen: {entry.blood_oxygen}%</p>
-                  <p>Heart Rate: {entry.heart_rate} bpm</p>
-                  <p>Temperature: {entry.temperature} °C</p>
-                  <p>Timestamp: {entry.timestamp}</p>
+                <li key={entry.id} className="border-b pb-4">
+                  <p className="text-gray-700">Time: <span className="font-semibold">{entry.timestamp}</span></p>
+                  <p className="text-gray-700">Blood Oxygen: <span className="font-semibold">{entry.blood_oxygen}%</span></p>
+                  <p className="text-gray-700">Heart Rate: <span className="font-semibold">{entry.heart_rate} bpm</span></p>
+                  <p className="text-gray-700">Temperature: <span className="font-semibold">{entry.temperature} °C</span></p>
                 </li>
               ))}
             </ul>
           ) : (
-            <p>No data available.</p> 
+            <p className="text-red-500">No data available.</p>
           )}
         </div>
       )}

@@ -36,7 +36,7 @@ function App() {
     };
 
     try {
-      const response = await fetch('http://<YOUR_FLASK_SERVER_IP>:5000/submitSleepData', {
+      const response = await fetch('http://127.0.0.1:5000/submitSleepData', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -74,6 +74,7 @@ function App() {
               value={sleepTime} 
               onChange={(e) => setSleepTime(e.target.value)} 
               required 
+              className="text-black"
             />
           </label>
           <br />
@@ -84,6 +85,7 @@ function App() {
               value={wakeTime} 
               onChange={(e) => setWakeTime(e.target.value)} 
               required 
+              className="text-black"
             />
           </label>
           <br />
