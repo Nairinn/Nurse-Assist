@@ -23,29 +23,43 @@ const AddPatientForm = () => {
 
     if (response.ok) {
       console.log('Patient added successfully');
+      setName('');
+      setPriorityLevel('');
     } else {
       console.log('Error adding patient');
     }
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <input
-        type="text"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-        placeholder="Patient Name"
-        required
-      />
-      <input
-        type="number"
-        value={priorityLevel}
-        onChange={(e) => setPriorityLevel(e.target.value)}
-        placeholder="Priority Level"
-        required
-      />
-      <button type="submit">Add Patient</button>
-    </form>
+    <div className="mx-6">
+      <form onSubmit={handleSubmit} className="flex items-center space-x-2">
+        <input
+          type="text"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          placeholder="Patient Name"
+          required
+          className="px-3 py-1 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+        <input
+          type="number"
+          value={priorityLevel}
+          onChange={(e) => setPriorityLevel(e.target.value)}
+          placeholder="Priority Lvl"
+          required
+          h1
+          min = '1'
+          max = '5'
+          className="px-3 py-1 border w-28 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+        <button
+          type="submit"
+          className="px-4 py-1 bg-lightBlue text-white rounded-md text-sm hover:bg-darkBlue transition"
+        >
+          Add Patient
+        </button>
+      </form>
+    </div>
   );
 };
 

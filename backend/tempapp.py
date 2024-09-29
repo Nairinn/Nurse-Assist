@@ -25,7 +25,7 @@ CORS(app)
 #device_file = device_folder + '/w1_slave'
 
 def mock_read_temp():
-    return random.uniform(30, 40)
+    return random.uniform(97, 101)
 
 def mock_read_heart_rate():
     return random.randint(60, 100)
@@ -177,14 +177,15 @@ def delete_patient(patient_id):
     try:
         connection = mysql.connector.connect(**DB_CONFIG)
         cursor = connection.cursor()
-
         cursor.execute("DELETE FROM patients WHERE id = %s", (patient_id,))
         connection.commit()
 
-        return jsonify({"message": "Patient deleted successfully"}), 200
+        if cursor.rowcount == 0:
+            return jsonify({"error": "Patient not found"}), 404
+
+        return jsonify({"message": f"Patient ID {patient_id} deleted successfully"}), 200
 
     except mysql.connector.Error as err:
-        print(f"Error: {err}")
         return jsonify({"error": str(err)}), 500
 
     finally:
@@ -193,10 +194,10 @@ def delete_patient(patient_id):
         if connection:
             connection.close()
 
+
 if __name__ == '__main__':
     data_thread = Thread(target=collect_data)
     data_thread.daemon = True  
     data_thread.start()
 
     app.run(host='0.0.0.0', port=5000)
-

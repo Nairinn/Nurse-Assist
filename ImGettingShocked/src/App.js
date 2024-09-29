@@ -11,9 +11,10 @@ const App = () => {
   return (
     <div>
       {location.pathname !== '/' && ( 
-        <div className='bg-customRed border-3 border-gray'>
-          <h1 className="flex items-center justify-center text-white font-bold text-2xl">
+        <div className='bg-customGreen border-3 border-gray pb-4 mb-4'>
+          <h1 className="flex items-center justify-center text-white font-bold text-2xl pt-3">
             NurseAssist
+            <img src="./doctor.png" alt="health icon" className="w-6 h-6 mx-2"></img>
           </h1>
         </div>
       )}
@@ -24,6 +25,7 @@ const App = () => {
           <>
 
             <CurrentTime />
+            <h2 className="text-4xl mb-6 font-semibold text-gray-800 mx-6 underline pt-3">Patient Data:</h2>
             <AddPatientForm />
             <PatientDataTable />
           </>

@@ -35,11 +35,14 @@ const CurrentTime = () => {
   };
 
   return (
-    <div className="text-center p-4">
+    <div className='flex items-center justify-center'>
+       <div className="text-center p-4 bg-white shadow-lg rounded-lg text-center">
       <p className="text-2xl">
         <strong>{`${getGreeting(currentTime)}!`}</strong> It is currently {formatDate(currentTime)}.
       </p>
+      </div>
     </div>
+   
   );
 };
 
